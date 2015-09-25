@@ -3,10 +3,10 @@ var stage = new createjs.Stage('stage')
 var player = function ($) {
   var HERO_WIDTH = 102
   var HERO_HEIGHT = 126
-  var SHOOT_SPEED = 3
+  var SHOOT_SPEED = 2
   var BULLET_WIDTH = 5
   var BULLET_HEIGHT = 11
-  var BULLET_SPEED = 1
+  var BULLET_SPEED = 2
 
   // Whole Container
   var player = new $.Container
@@ -35,7 +35,7 @@ var player = function ($) {
       flying: [0, 1, 'flying'],
       blowup: [2, 5, 'flying', 2]
     },
-    framerate: 12
+    framerate: 5
   }), 'flying')
 
   hero.on('hit', function () {
@@ -74,10 +74,14 @@ var player = function ($) {
 
   var shootCount = 0
   $.Ticker.addEventListener('tick', function () {
-    if (++shootCount == SHOOT_SPEED) {
-      shootCount = 0
-      shoot()
+    if (hero.currentAnimation != 'flying') {
+      return
     }
+    if (++shootCount < SHOOT_SPEED) {
+      return
+    }
+    shootCount = 0
+    shoot()
   })
 
   //////////// TEST
