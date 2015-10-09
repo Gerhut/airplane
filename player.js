@@ -1,6 +1,8 @@
 var player = function ($) {
   var HERO_WIDTH = 102
   var HERO_HEIGHT = 126
+  var HERO_START_X = 1 / 2
+  var HERO_START_Y = 4 / 5
   var SHOOT_DELAY = 5
   var BULLET_WIDTH = 5
   var BULLET_HEIGHT = 11
@@ -12,9 +14,11 @@ var player = function ($) {
 
   player.on('added', function () {
     var stage = this.stage
+    var stageWidth = stage.canvas.width
+    var stageHeight = stage.canvas.height
 
-    hero.x = stage.canvas.width / 2
-    hero.y = stage.canvas.height * 4 / 5
+    hero.x = stageWidth * HERO_START_X
+    hero.y = stageHeight * HERO_START_Y
 
     hero.gotoAndPlay('flying')
     stage.addEventListener('stagemousedown', onStageMouseDown)
@@ -38,8 +42,10 @@ var player = function ($) {
       if (hero.currentAnimation != 'flying') {
         return
       }
-      hero.x += event.stageX - lastX
-      hero.y += event.stageY - lastY
+      hero.x = Math.min(Math.max(hero.x + event.stageX - lastX,
+        HERO_WIDTH / 2), stageWidth - HERO_WIDTH / 2)
+      hero.y = Math.min(Math.max(hero.y + event.stageY - lastY,
+        HERO_HEIGHT / 2), stageHeight - HERO_HEIGHT / 2)
       lastX = event.stageX
       lastY = event.stageY
     }
