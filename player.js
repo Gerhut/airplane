@@ -10,25 +10,44 @@ var player = function ($) {
   var player = new $.Container
   player.hitters = {}
 
-  function onStageMouseMove(event) {
-    if (!$.Ticker.paused) {
-      hero.x = event.stageX
-      hero.y = event.stageY
-    }
-  }
-
   player.on('added', function () {
     var stage = this.stage
+
     hero.x = stage.canvas.width / 2
     hero.y = stage.canvas.height * 4 / 5
+
     hero.gotoAndPlay('flying')
-    stage.addEventListener('stagemousemove', onStageMouseMove)
+    stage.addEventListener('stagemousedown', onStageMouseDown)
+    player.hitters.hero = hero
     shoot()
 
     player.on('removed', function (event) {
-      hero.stop()
+      stage.removeEventListener('stagemousedown', onStageMouseDown)
       stage.removeEventListener('stagemousemove', onStageMouseMove)
+      stage.removeEventListener('stagemouseup', onStageMouseUp)
     }, null, true)
+
+    var lastX, laseY
+    function onStageMouseDown(event) {
+      lastX = event.stageX
+      lastY = event.stageY
+      stage.addEventListener('stagemousemove', onStageMouseMove)
+      stage.addEventListener('stagemouseup', onStageMouseUp)
+    }
+    function onStageMouseMove(event) {
+      if (hero.currentAnimation != 'flying') {
+        return
+      }
+      hero.x += event.stageX - lastX
+      hero.y += event.stageY - lastY
+      lastX = event.stageX
+      lastY = event.stageY
+    }
+    function onStageMouseUp(event) {
+      stage.removeEventListener('stagemousemove', onStageMouseMove)
+      stage.removeEventListener('stagemouseup', onStageMouseUp)
+      lastX = lastY = void 0
+    }
   })
 
   // Hero player
@@ -42,21 +61,20 @@ var player = function ($) {
       flying: [0, 1, 'flying'],
       blowup: [2, 5, null, .3]
     }
-  }), 'flying')
+  }))
 
   hero.regX = HERO_WIDTH / 2
   hero.regY = HERO_HEIGHT / 2
 
   hero.on('hit', function () {
+    delete player.hitters.hero
     hero.gotoAndPlay('blowup')
     hero.on('animationend', function () {
-      $.Ticker.paused = true
       console.log('Game Over!')
     }, null, true)
   })
 
   player.addChild(hero)
-  player.hitters.hero = hero
 
   // Bullet
   function Bullet() {
@@ -68,40 +86,41 @@ var player = function ($) {
     bullet.regY = BULLET_HEIGHT
     bullet.visible = false
 
-    bullet.on('hit', function () {
-      $.Tween.removeTweens(this)
-      Bullet.remove.call(this)
-    }, null, true)
+    bullet.on('added', onBulletAdded)
+    bullet.on('removed', onBulletRemoved)
+    bullet.on('hit', onBulletHit)
 
     return bullet
   }
 
-  Bullet.add = function add() {
-    player.addChild(this)
+  function onBulletAdded() {
     player.hitters['bullet-' + this.id] = this
   }
 
-  Bullet.remove = function remove() {
-    this.removeAllEventListeners()
-    player.removeChild(this)
+  function onBulletRemoved() {
     delete player.hitters['bullet-' + this.id]
+    this.removeAllEventListeners()
+    $.Tween.removeTweens(this)
   }
 
-  function shoot() {console.log('shoot')
-    if (hero.currentAnimation != 'flying' || hero.paused) {
-      return
-    }
+  function onBulletHit() {
+    player.removeChild(this)
+  }
 
-    var bullet = new Bullet()
+  function shoot() {
+    var bullet = new Bullet
 
-    $.Tween.get(bullet, {
-      useTicks: true
-    }).to({ visible: true }, SHOOT_DELAY)
-      .call(shoot)
+    $.Tween.get(bullet, { useTicks: true })
+      // show bullet after SHOOT_DELAY
+      .to({ visible: true }, SHOOT_DELAY)
+      // shoot next bullet if hero is still flying
+      .call(function () { hero.currentAnimation == 'flying' && shoot() })
+      // fly bullet to the top of screen
       .to({ x: hero.x, y: 0 }, hero.y * BULLET_SPEED)
-      .call(Bullet.remove)
+      // remove bullet
+      .call(function () { player.removeChild(this) })
 
-    Bullet.add.call(bullet)
+    player.addChild(bullet)
   }
 
   return player
