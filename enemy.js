@@ -223,7 +223,7 @@ $(function(resoureImage){
 				var self = this,
 					container,canvas;
 				self._gameover = false;
-				container = self.container = new createjs.Container();
+				enemy_container = container = self.container = new createjs.Container();
 				canvas = stage.canvas;
 				self._stageWidth = canvas.width;
 				self._stageHeight = canvas.height;
@@ -448,6 +448,7 @@ $(function(resoureImage){
 function $(loadback){
 	var resoure = new Image();
 	resoure.onload = function (){
+
 		loadback(this);
 	}
 	resoure.src = 'images/enemys.png';
