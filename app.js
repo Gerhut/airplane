@@ -1,4 +1,3 @@
-
 $(function(resoureImage){
 	enemyContianer = (function (){
 		var sheetMap = {};
@@ -192,12 +191,10 @@ $(function(resoureImage){
 					number: 60,
 					interval: 1000,
 					speed: SPEED_SOLIDER,
-					position:true
 				},{
 					name: 'leader',
 					number: 24,
 					interval: 2500,
-					position:true
 				},{
 					name: 'captain',
 					number: 9,
