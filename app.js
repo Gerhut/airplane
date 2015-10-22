@@ -134,6 +134,7 @@ $(function(resoureImage){
 				interval: 1500,
 				speed: SPEED_SOLIDER,
 				delay: 6000,
+				position:true
 			}],{
 				nextWave: true
 			}
@@ -149,6 +150,7 @@ $(function(resoureImage){
 				number: 30,
 				interval: 1500,
 				speed: SPEED_SOLIDER,
+				position:true
 			},{
 				name: 'leader',
 				number: 20,
@@ -181,7 +183,8 @@ $(function(resoureImage){
 			},{
 				name: 'leader',
 				number: 8,
-				interval: 2200
+				interval: 2200,
+				position:true
 			},{
 				name: 'captain',
 				number: 2,
@@ -197,11 +200,13 @@ $(function(resoureImage){
 				name: 'soldier',
 				number: 60,
 				interval: 1000,
-				speed: SPEED_SOLIDER
+				speed: SPEED_SOLIDER,
+				position:true
 			},{
 				name: 'leader',
 				number: 24,
 				interval: 2500,
+				position:true
 			},{
 				name: 'captain',
 				number: 9,
@@ -371,11 +376,65 @@ $(function(resoureImage){
 					data = enemySprite._data,
 					target = {},
 					speed;
+				var FLY_MODS_L2R = 0,FLY_MODS_R2L = 1,FLY_MODS_U2D = 2;
 				if(data.position===false){
 					enemySprite.x = Math.random()*(self._stageWidth - sheet.width);
 					enemySprite.y = -sheet.height;
 					target['y'] = self._stageHeight;
 					speed = data.speed;
+				}
+				if(data.position===true){
+					speed = data.speed;
+					var flyMods = parseInt(Math.random() * 3);
+					if(flyMods === FLY_MODS_L2R){
+						//从左侧飞入
+						enemySprite.x = -sheet.width;
+						enemySprite.y = parseInt(self._stageHeight * (Math.random()*4) / 10);
+						var angle = 2*Math.PI/360 *(parseInt(Math.random() * 45) + 30);
+						target['x'] = self._stageWidth;
+						target['y'] = enemySprite.y + (self._stageWidth / Math.tan(angle));
+					}else if(flyMods === FLY_MODS_R2L){
+						//从右侧飞入
+						enemySprite.x = self._stageWidth;
+						enemySprite.y = parseInt(self._stageHeight * (Math.random()*4) / 10);
+						var angle = 2*Math.PI/360 * (parseInt(Math.random() * 45) + 30);
+						target['x'] = -sheet.width;
+						target['y'] = enemySprite.y + (self._stageWidth / Math.tan(angle));
+					}else if(flyMods === FLY_MODS_U2D){
+						//从上向下
+						enemySprite.x = Math.random()*(self._stageWidth - sheet.width);
+						enemySprite.y = -sheet.height;
+						var angle = 2*Math.PI/360 * (45 - parseInt(Math.random() * 45)) ;
+						if(enemySprite.x < (0.5*(self._stageWidth - sheet.width))){			
+							//左半区向右
+							//target['x'] = self._stageWidth;
+							var tempWidth = self._stageWidth - enemySprite.x;
+							var tempHight = tempWidth / Math.tan(angle);
+							if(tempHight <= self._stageHeight){
+								//从右侧飞出
+								target['x'] = self._stageWidth;
+								target['y'] = tempHight;
+							}else{
+								//从屏幕下边飞出
+								target['x'] = enemySprite.x + self._stageHeight *  Math.tan(angle);
+								target['y'] = self._stageHeight;
+							}
+						}else{
+							//右半区向左
+							//target['x'] = -sheet.width;
+							var tempWidth = enemySprite.x;
+							var tempHight = tempWidth / Math.tan(angle);
+							if(tempHight <= self._stageHeight){
+								//从左侧飞出
+								target['x'] = -sheet.width;
+								target['y'] = tempHight;
+							}else{
+								//从屏幕下边飞出
+								target['x'] = enemySprite.x - self._stageHeight *  Math.tan(angle);
+								target['y'] = self._stageHeight;
+							}
+						}
+					}
 				}
 				//设置运动
 				createjs.Tween.
