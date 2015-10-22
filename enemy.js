@@ -17,7 +17,7 @@ $(function(resoureImage){
 			],
 			"animations": {
 				"run": [0],
-				"die": [1,4]
+				"die": [1,4, null, .3]
 			}
 		}),
 		create: function(){
@@ -47,7 +47,7 @@ $(function(resoureImage){
 			],
 			"animations": {
 				"run": [0],
-				"die": [1,4,null,0.1]
+				"die": [1,4,null,0.3]
 			}
 		}),
 		create: function(){
@@ -87,7 +87,7 @@ $(function(resoureImage){
 				"run": [0,1,"run",0.3],
 				"beHit": [2,2,"damage",0.2],
 				"damage": [3],
-				"die": [4,8,null,0.2]
+				"die": [4,8,null,0.3]
 			}
 		}),
 		create: function(){
@@ -404,7 +404,7 @@ $(function(resoureImage){
 		return EC;
 	})();
 	//开启管卡
-	var eneControl = new EnemyController(sheetMap,waveMap);
+	var eneControl = window.enemy = new EnemyController(sheetMap,waveMap);
 	eneControl.start(stage);
 
 	function addWave(enemysInfo,options){
@@ -420,7 +420,7 @@ $(function(resoureImage){
 				//延迟显示
 				delay: 0,
 				//位置 false:x轴随机垂直下落,
-			 	//[true/false,0,outx,outy] 
+			 	//[true/false,0,outx,outy]
 				position: false,
 				runType: 1,
 				speed: 8000,

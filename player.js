@@ -3,11 +3,11 @@ var player = function ($) {
   var HERO_HEIGHT = 126
   var HERO_START_X = 1 / 2
   var HERO_START_Y = 4 / 5
-  var SHOOT_DELAY = 5
+  var SHOOT_DELAY = 15
   var BULLET_WIDTH = 5
   var BULLET_HEIGHT = 11
   var BULLET_SPEED = .08
-  console.log(2);
+
   // Whole Container
   var player = new $.Container
   player.hitters = {}
@@ -118,11 +118,11 @@ var player = function ($) {
 
     $.Tween.get(bullet, { useTicks: true })
       // show bullet after SHOOT_DELAY
-      .to({ visible: true }, SHOOT_DELAY)
+      .to({ x: hero.x, visible: true }, SHOOT_DELAY)
       // shoot next bullet if hero is still flying
       .call(function () { hero.currentAnimation == 'flying' && shoot() })
       // fly bullet to the top of screen
-      .to({ x: hero.x, y: 0 }, hero.y * BULLET_SPEED)
+      .to({ y: 0 }, hero.y * BULLET_SPEED)
       // remove bullet
       .call(function () { player.removeChild(this) })
 
