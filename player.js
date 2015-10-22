@@ -76,7 +76,7 @@ var player = function ($) {
     delete player.hitters.hero
     hero.gotoAndPlay('blowup')
     hero.on('animationend', function () {
-      console.log('Game Over!')
+      end(true)
     }, null, true)
   })
 
